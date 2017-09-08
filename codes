@@ -1,0 +1,69 @@
+# ++++++++++++++++++++
+# Problem 3          +
+# ++++++++++++++++++++
+import os
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+
+#  Change these paths before running the code ##
+output_path =open('C:\\Users\\Ako\\Documents\\job\\nEW jOB\\Exam\\exam-content\\coding-data-exam\\answers\\YearHistogram.out', 'w')
+fileReader = pd.read_csv('C:\\Users\\Ako\\Documents\\job\\nEW jOB\\Exam\\exam-content\\coding-data-exam\\answers\YearlyAverages.out', keep_default_na=False, sep='\t',
+                         header=None, error_bad_lines=False, names=["filename", "year", "Max", "Min",  "Precip"])
+
+# ++++++++++++++++++++
+# Begin Scripting    +
+# ++++++++++++++++++++
+
+Max_dict = {}
+Min_dict = {}
+Precip_dict = {}
+
+maxi = fileReader.groupby(['filename'], sort=False)['Max'].transform(max) == fileReader['Max']
+df = fileReader[maxi].groupby('year').count()['Max']
+for key in df.iteritems():
+    Max_dict[key[0]] = key[1].item()
+
+mini = fileReader.groupby(['filename'], sort=False)['Min'].transform(max) == fileReader['Min']
+
+df = fileReader[mini].groupby('year').count()['Min']
+
+for key in df.iteritems():
+    Min_dict[key[0]] = key[1].item()
+
+Precipitation = fileReader.groupby(['filename'], sort=False)['Precip'].transform(max) == fileReader['Precip']
+df = fileReader[Precipitation].groupby('year').count()['Precip']
+for each in df.iteritems():
+    Precip_dict[each[0]] = each[1].item()
+
+for each_year, value in Max_dict.items():
+    output_path.write(str(each_year.item())+'\t'+str(value)+'\t'+str(Min_dict.get(each_year,0))+'\t'+str(Precip_dict.get(each_year,0)))
+    output_path.write("\n")
+output_path.close()
+
+# End of Scripting ## part1
+
+# Creating the Histogram
+f = pd.read_csv('C:\\Users\\Ako\\Documents\\job\\nEW jOB\\Exam\\exam-content\\coding-data-exam\\answers\\YearHistogram.out',
+                sep='\t',names=["year", "Max", "Min",  "Precip"])
+w = f['year']
+x = f['Max']
+y = f['Min']
+z = f['Precip']
+
+fig, ax = plt.subplots()
+
+ax.bar(w, x,color='b',alpha= 0.8,align='center',label='Max averages')
+ax.bar(w, y,color='g',align='center',label='Min averages')
+ax.bar(w, z,color='r',align='center',label='Percipitation totals')
+legend = ax.legend(loc='upper left', shadow=True)
+
+plt.title("YearHistogram")
+plt.xlabel("Year")
+plt.ylabel("Frequency")
+plt.grid(True)
+
+plt.savefig('C:\\Users\\Ako\\Documents\\job\\nEW jOB\\Exam\\exam-content\\coding-data-exam\\answers\\YearHistogram.png', dpi=300)
+
+# End of Histogram part #
